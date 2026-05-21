@@ -1,907 +1,994 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Veyantra — Engineering Modern Digital Systems</title>
-
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="Veyantra is engineering modern digital systems. Launching soon." />
-    <meta name="keywords" content="Veyantra, technology, digital systems, engineering, SaaS, cybersecurity" />
-    <meta name="author" content="Veyantra" />
-    <meta name="robots" content="index, follow" />
-
-    <!-- Open Graph -->
-    <meta property="og:title" content="Veyantra — Engineering Modern Digital Systems" />
-    <meta property="og:description"
-        content="Launching soon. Veyantra is building the infrastructure for modern digital operations." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://veyantra.com" />
-
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Veyantra — Engineering Modern Digital Systems" />
-    <meta name="twitter:description" content="Launching soon." />
-
-    <!-- Favicon (inline SVG as data URI) -->
-    <link rel="icon" type="image/svg+xml"
-        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,10 90,35 90,65 50,90 10,65 10,35' fill='none' stroke='%23e2e8f0' stroke-width='6'/%3E%3Cpolygon points='50,25 75,40 75,60 50,75 25,60 25,40' fill='none' stroke='%23e2e8f0' stroke-width='4'/%3E%3C/svg%3E" />
-
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-        href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@300;400&display=swap"
-        rel="stylesheet" />
-
-    <style>
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        :root {
-            --bg: #0B0B0C;
-            --bg-2: #0f0f11;
-            --surface: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.07);
-            --text-primary: #f0f0f0;
-            --text-secondary: rgba(240, 240, 240, 0.45);
-            --text-muted: rgba(240, 240, 240, 0.25);
-            --accent: #c8d0e0;
-            --glow: rgba(180, 200, 230, 0.06);
-            --font-main: 'DM Sans', sans-serif;
-            --font-mono: 'DM Mono', monospace;
-        }
-
-        html,
-        body {
-            height: 100%;
-            background: var(--bg);
-            color: var(--text-primary);
-            font-family: var(--font-main);
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* ── LOADING SCREEN ── */
-        #loader {
-            position: fixed;
-            inset: 0;
-            background: var(--bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            transition: opacity 0.8s ease, visibility 0.8s ease;
-        }
-
-        #loader.hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .loader-ring {
-            width: 36px;
-            height: 36px;
-            border: 1.5px solid var(--border);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* ── BACKGROUND ── */
-        .bg-canvas {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        /* Radial glow */
-        .bg-glow {
-            position: absolute;
-            top: 30%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 700px;
-            height: 700px;
-            background: radial-gradient(ellipse at center,
-                    rgba(160, 185, 220, 0.055) 0%,
-                    rgba(120, 150, 200, 0.025) 40%,
-                    transparent 70%);
-            pointer-events: none;
-        }
-
-        /* Animated dot grid */
-        #grid-canvas {
-            position: absolute;
-            inset: 0;
-            opacity: 0.35;
-        }
-
-        /* Floating particles */
-        #particles-canvas {
-            position: absolute;
-            inset: 0;
-            opacity: 0.6;
-        }
-
-        /* ── MAIN LAYOUT ── */
-        .page {
-            position: relative;
-            z-index: 1;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 48px 24px;
-        }
-
-        /* ── NAV ── */
-        nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 10;
-            padding: 24px 40px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            opacity: 0;
-            animation: fadeDown 0.7s ease 1.2s forwards;
-        }
-
-        .nav-logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-        }
-
-        .nav-logo-mark {
-            width: 22px;
-            height: 22px;
-            opacity: 0.85;
-        }
-
-        .nav-brand {
-            font-size: 13px;
-            font-weight: 500;
-            letter-spacing: 0.08em;
-            color: var(--text-primary);
-            text-transform: uppercase;
-        }
-
-        .nav-status {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            font-family: var(--font-mono);
-            font-size: 11px;
-            color: var(--text-muted);
-            letter-spacing: 0.05em;
-        }
-
-        .status-dot {
-            width: 5px;
-            height: 5px;
-            background: #6ee7b7;
-            border-radius: 50%;
-            animation: pulse-dot 2.5s ease-in-out infinite;
-        }
-
-        @keyframes pulse-dot {
-
-            0%,
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-
-            50% {
-                opacity: 0.4;
-                transform: scale(0.7);
-            }
-        }
-
-        /* ── HERO ── */
-        .hero {
-            max-width: 680px;
-            width: 100%;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 28px;
-        }
-
-        /* Logo mark */
-        .logo-container {
-            opacity: 0;
-            animation: fadeUp 0.8s ease 1.4s forwards;
-        }
-
-        .logo-svg {
-            width: 64px;
-            height: 64px;
-            filter: drop-shadow(0 0 18px rgba(180, 200, 230, 0.18));
-        }
-
-        /* Pill badge */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            padding: 5px 14px 5px 10px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 100px;
-            font-family: var(--font-mono);
-            font-size: 10.5px;
-            letter-spacing: 0.1em;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            opacity: 0;
-            animation: fadeUp 0.8s ease 1.6s forwards;
-        }
-
-        .badge-dot {
-            width: 4px;
-            height: 4px;
-            background: var(--accent);
-            border-radius: 50%;
-            opacity: 0.7;
-        }
-
-        /* Heading */
-        .heading {
-            opacity: 0;
-            animation: fadeUp 0.9s ease 1.8s forwards;
-        }
-
-        h1 {
-            font-size: clamp(52px, 10vw, 88px);
-            font-weight: 300;
-            letter-spacing: -0.03em;
-            line-height: 1;
-            color: var(--text-primary);
-        }
-
-        h1 span {
-            color: transparent;
-            background: linear-gradient(135deg, #e8edf5 0%, #a0b4cc 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-        }
-
-        /* Subheading */
-        .subheading {
-            font-size: clamp(14px, 2vw, 16px);
-            font-weight: 300;
-            line-height: 1.7;
-            color: var(--text-secondary);
-            letter-spacing: 0.01em;
-            max-width: 420px;
-            opacity: 0;
-            animation: fadeUp 0.9s ease 2.0s forwards;
-        }
-
-        /* Divider */
-        .divider {
-            width: 40px;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--border), transparent);
-            opacity: 0;
-            animation: fadeUp 0.7s ease 2.1s forwards;
-        }
-
-        /* ── COUNTDOWN ── */
-        .countdown-wrap {
-            opacity: 0;
-            animation: fadeUp 0.9s ease 2.2s forwards;
-            width: 100%;
-        }
-
-        .countdown-label {
-            font-family: var(--font-mono);
-            font-size: 10px;
-            letter-spacing: 0.18em;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .countdown {
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .cd-unit {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            min-width: 72px;
-        }
-
-        .cd-box {
-            width: 100%;
-            padding: 18px 12px 16px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .cd-box::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-        }
-
-        .cd-number {
-            font-family: var(--font-mono);
-            font-size: clamp(26px, 5vw, 38px);
-            font-weight: 300;
-            color: var(--text-primary);
-            letter-spacing: -0.02em;
-            line-height: 1;
-            text-align: center;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .cd-number.tick {
-            animation: numTick 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes numTick {
-            0% {
-                transform: translateY(-6px);
-                opacity: 0.3;
-            }
-
-            100% {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .cd-label {
-            font-family: var(--font-mono);
-            font-size: 9px;
-            letter-spacing: 0.15em;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .cd-sep {
-            font-family: var(--font-mono);
-            font-size: 28px;
-            font-weight: 200;
-            color: var(--text-muted);
-            opacity: 0.4;
-            padding-top: 14px;
-            line-height: 1;
-        }
-
-        /* ── EMAIL FORM ── */
-        .notify-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            opacity: 0;
-            animation: fadeUp 0.9s ease 2.4s forwards;
-            width: 100%;
-            max-width: 380px;
-        }
-
-        .notify-text {
-            font-size: 12px;
-            font-weight: 300;
-            color: var(--text-muted);
-            letter-spacing: 0.04em;
-        }
-
-        .notify-form {
-            display: flex;
-            gap: 8px;
-            width: 100%;
-        }
-
-        .notify-input {
-            flex: 1;
-            padding: 11px 16px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text-primary);
-            font-family: var(--font-main);
-            font-size: 13px;
-            font-weight: 300;
-            outline: none;
-            transition: border-color 0.2s ease;
-        }
-
-        .notify-input::placeholder {
-            color: var(--text-muted);
-        }
-
-        .notify-input:focus {
-            border-color: rgba(255, 255, 255, 0.15);
-        }
-
-        .notify-btn {
-            padding: 11px 18px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 6px;
-            color: var(--text-primary);
-            font-family: var(--font-main);
-            font-size: 12px;
-            font-weight: 400;
-            letter-spacing: 0.04em;
-            cursor: pointer;
-            transition: background 0.2s ease, border-color 0.2s ease;
-            white-space: nowrap;
-        }
-
-        .notify-btn:hover {
-            background: rgba(255, 255, 255, 0.09);
-            border-color: rgba(255, 255, 255, 0.18);
-        }
-
-        .notify-btn:active {
-            transform: scale(0.98);
-        }
-
-        .notify-success {
-            font-family: var(--font-mono);
-            font-size: 11px;
-            color: #6ee7b7;
-            letter-spacing: 0.05em;
-            display: none;
-        }
-
-        /* ── FOOTER ── */
-        footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 20px 40px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            opacity: 0;
-            animation: fadeUp 0.7s ease 2.6s forwards;
-        }
-
-        .footer-copy {
-            font-family: var(--font-mono);
-            font-size: 10px;
-            color: var(--text-muted);
-            letter-spacing: 0.06em;
-        }
-
-        .footer-links {
-            display: flex;
-            gap: 20px;
-        }
-
-        .footer-link {
-            font-family: var(--font-mono);
-            font-size: 10px;
-            color: var(--text-muted);
-            letter-spacing: 0.06em;
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-
-        .footer-link:hover {
-            color: var(--text-secondary);
-        }
-
-        /* ── ANIMATIONS ── */
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(14px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* ── RESPONSIVE ── */
-        @media (max-width: 600px) {
-            nav {
-                padding: 20px 24px;
-            }
-
-            footer {
-                padding: 20px 24px;
-                flex-direction: column;
-                gap: 10px;
-                text-align: center;
-            }
-
-            .footer-links {
-                justify-content: center;
-            }
-
-            .cd-unit {
-                min-width: 56px;
-            }
-
-            .cd-box {
-                padding: 14px 8px 12px;
-            }
-
-            .notify-form {
-                flex-direction: column;
-            }
-
-            h1 {
-                letter-spacing: -0.02em;
-            }
-        }
-    </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="theme-color" content="#0B0B0C"/>
+<title>Veyantra — Engineering Modern Digital Systems</title>
+<meta name="description" content="Veyantra builds security-first websites, AI systems, automation, and modern digital infrastructure with measurable outcomes."/>
+<meta name="keywords" content="Veyantra, case studies, founder, testimonials, technology, digital systems, engineering, SaaS, cybersecurity, AI automation"/>
+<meta name="author" content="Veyantra"/>
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
+<link rel="canonical" href="https://veyantra.in/"/>
+<link rel="alternate" hreflang="en-IN" href="https://veyantra.in/"/>
+<link rel="alternate" hreflang="x-default" href="https://veyantra.in/"/>
+<meta property="og:title" content="Veyantra — Engineering Modern Digital Systems"/>
+<meta property="og:description" content="Featured projects, founder story, testimonials, and security-first digital systems from Veyantra."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://veyantra.in"/>
+<meta property="og:site_name" content="Veyantra"/>
+<meta property="og:locale" content="en_IN"/>
+<meta property="og:image" content="https://veyantra.in/veyantra-logo-light.png"/>
+<meta property="og:image:alt" content="Veyantra logo"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Veyantra — Engineering Modern Digital Systems"/>
+<meta name="twitter:description" content="Featured projects, founder story, testimonials, and AI-ready digital systems."/>
+<meta name="twitter:site" content="@officialveyantra"/>
+<meta name="twitter:image" content="https://veyantra.in/veyantra-logo-light.png"/>
+<link rel="icon" type="image/png" href="veyantra-logo-light.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://veyantra.in/#organization",
+      "name": "Veyantra",
+      "url": "https://veyantra.in/",
+      "logo": "https://veyantra.in/veyantra-logo-light.png",
+      "description": "Veyantra builds security-first websites, AI systems, automation, and modern digital infrastructure.",
+      "founder": {
+        "@type": "Person",
+        "name": "Yogendra Meena"
+      },
+      "sameAs": [
+        "https://www.linkedin.com/company/veyantra/",
+        "https://www.instagram.com/officialveyantra.in/"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "sales",
+        "email": "contact.yogendrameena@gmail.com",
+        "availableLanguage": [
+          "en",
+          "hi"
+        ]
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://veyantra.in/#website",
+      "url": "https://veyantra.in/",
+      "name": "Veyantra",
+      "publisher": {
+        "@id": "https://veyantra.in/#organization"
+      }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://veyantra.in/#webpage",
+      "url": "https://veyantra.in/",
+      "name": "Veyantra — Engineering Modern Digital Systems",
+      "description": "Security-first web products, AI automation, and founder-led digital delivery for modern businesses.",
+      "isPartOf": {
+        "@id": "https://veyantra.in/#website"
+      },
+      "about": {
+        "@id": "https://veyantra.in/#organization"
+      }
+    },
+    {
+      "@type": "ProfessionalService",
+      "@id": "https://veyantra.in/#service",
+      "name": "Veyantra",
+      "url": "https://veyantra.in/",
+      "areaServed": "Worldwide",
+      "serviceType": [
+        "Web Engineering",
+        "UI/UX Systems",
+        "AI Integrations",
+        "Cybersecurity",
+        "Cloud Infrastructure",
+        "Automation Systems"
+      ],
+      "provider": {
+        "@id": "https://veyantra.in/#organization"
+      }
+    }
+  ]
+}
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0B0B0C;--bg2:#0f0f11;--bg3:#131315;
+  --surface:rgba(255,255,255,0.03);--surface-h:rgba(255,255,255,0.055);
+  --border:rgba(255,255,255,0.07);--border-h:rgba(255,255,255,0.13);
+  --tp:#f0f0f0;--ts:rgba(240,240,240,0.45);--tm:rgba(240,240,240,0.25);
+  --accent:#c8d0e0;--accent-d:rgba(180,200,230,0.5);
+  --green:#6ee7b7;
+  --fm:'DM Sans',sans-serif;--fmo:'DM Mono',monospace;
+}
+html{scroll-behavior:smooth}
+html,body{background:var(--bg);color:var(--tp);font-family:var(--fm);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+::selection{background:rgba(200,208,224,0.15);color:var(--tp)}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
+
+/* LOADER */
+#loader{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:200;transition:opacity 0.8s ease,visibility 0.8s ease}
+#loader.hidden{opacity:0;visibility:hidden}
+.loader-ring{width:36px;height:36px;border:1.5px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* BG */
+.bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+.bg-glow{position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);width:700px;height:700px;background:radial-gradient(ellipse at center,rgba(160,185,220,0.055) 0%,rgba(120,150,200,0.025) 40%,transparent 70%);pointer-events:none}
+#grid-canvas{position:absolute;inset:0;opacity:0.35}
+#particles-canvas{position:absolute;inset:0;opacity:0.6}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:24px 48px;display:flex;align-items:center;justify-content:space-between;transition:background 0.4s,border-color 0.4s;border-bottom:1px solid transparent;opacity:0;animation:fadeDown 0.7s ease 1.2s forwards}
+nav.scrolled{background:rgba(11,11,12,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom-color:var(--border)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo-mark{width:22px;height:22px;opacity:0.85}
+.nav-brand{font-size:13px;font-weight:500;letter-spacing:0.08em;color:var(--tp);text-transform:uppercase}
+.nav-links{display:flex;align-items:center;gap:24px;list-style:none;flex-wrap:wrap;justify-content:flex-end;max-width:720px}
+.nav-links a{font-family:var(--fmo);font-size:10.5px;color:var(--tm);text-decoration:none;letter-spacing:0.07em;text-transform:uppercase;transition:color 0.2s}
+.nav-links a:hover{color:var(--ts)}
+.nav-cta-lnk{color:var(--ts) !important;padding:7px 16px;border:1px solid var(--border);border-radius:6px;transition:border-color 0.2s,color 0.2s,background 0.2s !important}
+.nav-cta-lnk:hover{border-color:var(--border-h) !important;background:var(--surface) !important;color:var(--tp) !important}
+.nav-status{display:flex;align-items:center;gap:7px;font-family:var(--fmo);font-size:11px;color:var(--tm);letter-spacing:0.05em}
+.status-dot{width:5px;height:5px;background:var(--green);border-radius:50%;animation:pulse-dot 2.5s ease-in-out infinite}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.7)}}
+
+/* HERO */
+.hero-section{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:120px 24px 100px}
+.hero{max-width:680px;width:100%;text-align:center;display:flex;flex-direction:column;align-items:center;gap:28px}
+.logo-container{opacity:0;animation:fadeUp 0.8s ease 1.4s forwards}
+.logo-svg{width:72px;height:72px;filter:drop-shadow(0 0 22px rgba(180,200,230,0.2))}
+.badge{display:inline-flex;align-items:center;gap:7px;padding:5px 14px 5px 10px;background:var(--surface);border:1px solid var(--border);border-radius:100px;font-family:var(--fmo);font-size:10.5px;letter-spacing:0.1em;color:var(--tm);text-transform:uppercase;opacity:0;animation:fadeUp 0.8s ease 1.6s forwards}
+.badge-dot{width:4px;height:4px;background:var(--accent);border-radius:50%;opacity:0.7}
+.heading{opacity:0;animation:fadeUp 0.9s ease 1.8s forwards}
+h1{font-size:clamp(52px,10vw,88px);font-weight:300;letter-spacing:-0.03em;line-height:1;color:var(--tp)}
+h1 span{color:transparent;background:linear-gradient(135deg,#e8edf5 0%,#a0b4cc 100%);-webkit-background-clip:text;background-clip:text}
+.subheading{font-size:clamp(14px,2vw,16px);font-weight:300;line-height:1.7;color:var(--ts);letter-spacing:0.01em;max-width:420px;opacity:0;animation:fadeUp 0.9s ease 2s forwards}
+.hero-desc{font-size:14px;font-weight:300;color:var(--tm);line-height:1.75;max-width:400px;opacity:0;animation:fadeUp 0.9s ease 2.1s forwards}
+.hero-divider{width:40px;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);opacity:0;animation:fadeUp 0.7s ease 2.15s forwards}
+.hero-ctas{display:flex;align-items:center;gap:10px;opacity:0;animation:fadeUp 0.9s ease 2.2s forwards}
+.btn-p{padding:11px 24px;background:rgba(200,208,224,0.08);border:1px solid rgba(200,208,224,0.18);border-radius:7px;color:var(--tp);font-family:var(--fm);font-size:13px;font-weight:400;letter-spacing:0.02em;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:all 0.25s ease}
+.btn-p:hover{background:rgba(200,208,224,0.13);border-color:rgba(200,208,224,0.28)}
+.btn-s{padding:11px 22px;background:transparent;border:1px solid var(--border);border-radius:7px;color:var(--tm);font-family:var(--fm);font-size:13px;font-weight:300;letter-spacing:0.02em;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:all 0.25s ease}
+.btn-s:hover{border-color:var(--border-h);color:var(--ts)}
+.btn-p[data-magnet],.btn-s[data-magnet]{will-change:transform;transition:transform 0.2s ease,background 0.25s ease,border-color 0.25s ease,color 0.25s ease}
+.btn-p[data-magnet]:hover,.btn-s[data-magnet]:hover{transform:translateY(-1px) scale(1.01)}
+.hero-scroll{margin-top:12px;display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;animation:fadeUp 0.9s ease 2.6s forwards}
+.scroll-label{font-family:var(--fmo);font-size:9px;letter-spacing:0.18em;color:var(--tm);text-transform:uppercase}
+.scroll-line{width:1px;height:36px;background:linear-gradient(to bottom,rgba(200,208,224,0.25),transparent);animation:scrollP 2s ease-in-out infinite}
+@keyframes scrollP{0%,100%{opacity:0.3}50%{opacity:0.8}}
+
+/* SHARED */
+.section{position:relative;z-index:1;padding:100px 48px}
+.si{max-width:1080px;margin:0 auto}
+.sec-lbl{font-family:var(--fmo);font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--tm);margin-bottom:20px}
+.sec-h{font-size:clamp(28px,4vw,44px);font-weight:300;letter-spacing:-0.025em;line-height:1.15;color:var(--tp);margin-bottom:16px}
+.sec-h em{font-style:normal;color:transparent;background:linear-gradient(135deg,#e8edf5 0%,#a0b4cc 100%);-webkit-background-clip:text;background-clip:text}
+.sec-sub{font-size:14px;font-weight:300;color:var(--ts);line-height:1.75;max-width:460px}
+.rule{width:100%;height:1px;background:var(--border);position:relative;z-index:1}
+
+/* ABOUT */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.about-visual{display:flex;align-items:center;justify-content:center}
+.about-stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-top:40px}
+.sbox{background:var(--bg2);padding:20px 22px}
+.snum{font-family:var(--fmo);font-size:28px;font-weight:300;color:var(--tp);letter-spacing:-0.03em}
+.slbl{font-family:var(--fmo);font-size:9px;letter-spacing:0.12em;color:var(--tm);text-transform:uppercase;margin-top:4px}
+
+/* SERVICES */
+.svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-top:48px}
+.svc{background:var(--bg2);padding:32px 28px;position:relative;cursor:default;transition:background 0.3s}
+.svc::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top left,rgba(200,208,224,0.04),transparent 60%);opacity:0;transition:opacity 0.3s;pointer-events:none}
+.svc:hover{background:var(--bg3)}
+.svc:hover::after{opacity:1}
+.svc-ico{width:36px;height:36px;margin-bottom:20px;color:var(--accent-d)}
+.svc-t{font-size:13px;font-weight:500;letter-spacing:0.02em;color:var(--tp);margin-bottom:8px}
+.svc-d{font-size:12.5px;font-weight:300;color:var(--ts);line-height:1.65}
+.svc-arr{position:absolute;bottom:22px;right:22px;font-family:var(--fmo);font-size:12px;color:var(--tm);opacity:0;transform:translate(-3px,3px);transition:all 0.25s}
+.svc:hover .svc-arr{opacity:0.6;transform:translate(0,0)}
+
+/* PHILOSOPHY */
+.phi-bg{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.prin-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:40px;margin-top:56px}
+.prin{border-top:1px solid var(--border);padding-top:24px}
+.prin-n{font-family:var(--fmo);font-size:9px;letter-spacing:0.15em;color:var(--tm);text-transform:uppercase;margin-bottom:14px}
+.prin-t{font-size:14px;font-weight:500;color:var(--tp);margin-bottom:10px;letter-spacing:0.01em}
+.prin-d{font-size:12.5px;font-weight:300;color:var(--ts);line-height:1.7}
+
+/* CAPABILITIES */
+.cap-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:48px}
+.cap{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:24px 22px;display:flex;gap:16px;align-items:flex-start;transition:all 0.3s}
+.cap:hover{background:var(--surface-h);border-color:var(--border-h)}
+.cap.wide{grid-column:1/-1}
+.cap-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);opacity:0.5;flex-shrink:0;margin-top:5px}
+.cap.wide .cap-dot{opacity:0.8}
+.cap-t{font-size:13px;font-weight:500;color:var(--tp);margin-bottom:6px;letter-spacing:0.01em}
+.cap-b{font-size:12.5px;font-weight:300;color:var(--ts);line-height:1.65}
+
+/* VISION */
+.vis-sec{text-align:center;background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:120px 48px;position:relative;overflow:hidden;z-index:1}
+.vis-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:500px;height:300px;background:radial-gradient(ellipse,rgba(160,185,220,0.045) 0%,transparent 70%);pointer-events:none}
+.vis-inner{position:relative;z-index:2;max-width:640px;margin:0 auto}
+.vis-q{font-size:clamp(18px,2.5vw,26px);font-weight:300;color:var(--ts);line-height:1.6;letter-spacing:-0.015em;margin-bottom:36px}
+.vis-q em{font-style:normal;color:var(--tp)}
+
+/* PROOF SECTIONS */
+.proof-grid,.founder-grid,.why-grid,.stack-grid,.pricing-grid,.test-grid,.trust-grid,.product-grid{display:grid;gap:16px;margin-top:44px}
+.proof-grid{grid-template-columns:repeat(3,1fr)}
+.case-card,.founder-card,.why-card,.stack-card,.price-card,.test-card,.trust-card,.product-card{position:relative;background:linear-gradient(180deg,rgba(255,255,255,0.045),rgba(255,255,255,0.02));border:1px solid var(--border);border-radius:16px;overflow:hidden;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 20px 80px rgba(0,0,0,0.18)}
+.case-card:hover,.founder-card:hover,.why-card:hover,.stack-card:hover,.price-card:hover,.test-card:hover,.trust-card:hover,.product-card:hover{border-color:var(--border-h);transform:translateY(-2px)}
+.case-card{padding:28px 24px;min-height:248px;display:flex;flex-direction:column;gap:16px;transition:transform 0.25s ease,border-color 0.25s ease}
+.case-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+.case-name{font-size:18px;font-weight:500;color:var(--tp);letter-spacing:-0.01em}
+.case-tag{font-family:var(--fmo);font-size:9px;letter-spacing:0.16em;color:var(--tm);text-transform:uppercase}
+.case-prob,.case-build,.case-outcome{font-size:13px;line-height:1.7;color:var(--ts)}
+.case-label{font-family:var(--fmo);font-size:9px;letter-spacing:0.14em;color:var(--tm);text-transform:uppercase;margin-bottom:4px}
+.case-tech{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto}
+.chip,.stack-chip,.social-chip,.price-chip,.review-chip,.trust-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,0.03);font-family:var(--fmo);font-size:9px;letter-spacing:0.08em;color:var(--tm);text-transform:uppercase}
+.founder-grid{grid-template-columns:0.95fr 1.05fr;align-items:stretch}
+.founder-photo{position:relative;min-height:460px;border-radius:18px;overflow:hidden;background:radial-gradient(circle at 30% 20%,rgba(200,208,224,0.18),transparent 30%),linear-gradient(160deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02));border:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:22px}
+.founder-photo::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 0%,rgba(11,11,12,0.28) 100%);z-index:1}
+.founder-photo::after{content:'';position:absolute;inset:14px;border-radius:14px;border:1px solid rgba(255,255,255,0.06);pointer-events:none;z-index:1}
+.founder-img{position:relative;z-index:0;width:100%;height:100%;max-width:420px;max-height:420px;object-fit:cover;object-position:center top;border-radius:18px;border:1px solid rgba(255,255,255,0.1);box-shadow:0 24px 90px rgba(0,0,0,0.3);filter:saturate(0.92) contrast(1.02) brightness(0.95)}
+.founder-card{padding:34px 30px;display:flex;flex-direction:column;gap:20px;transition:transform 0.25s ease,border-color 0.25s ease}
+.founder-kicker{font-family:var(--fmo);font-size:9px;letter-spacing:0.16em;color:var(--tm);text-transform:uppercase}
+.founder-title{font-size:clamp(28px,4vw,42px);font-weight:300;letter-spacing:-0.03em;line-height:1.08}
+.founder-copy{font-size:14px;line-height:1.8;color:var(--ts);max-width:560px}
+.founder-story{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.story-pill{padding:16px;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,0.02)}
+.story-k{font-family:var(--fmo);font-size:9px;letter-spacing:0.14em;color:var(--tm);text-transform:uppercase;margin-bottom:8px}
+.story-v{font-size:13px;line-height:1.7;color:var(--ts)}
+.why-grid{grid-template-columns:repeat(3,1fr)}
+.why-card,.stack-card,.price-card,.test-card,.trust-card,.product-card{padding:24px;transition:transform 0.25s ease,border-color 0.25s ease}
+.why-t,.stack-t,.price-t,.test-t,.trust-t,.product-t{font-size:15px;font-weight:500;color:var(--tp);margin-bottom:10px}
+.why-d,.stack-d,.price-d,.test-d,.trust-d,.product-d{font-size:13px;line-height:1.7;color:var(--ts)}
+.why-k{font-family:var(--fmo);font-size:9px;letter-spacing:0.14em;color:var(--tm);text-transform:uppercase;margin-bottom:14px}
+.process-wrap{margin-top:44px;border:1px solid var(--border);border-radius:18px;overflow:hidden;background:rgba(255,255,255,0.02)}
+.process-row{display:grid;grid-template-columns:140px 1fr;gap:24px;padding:20px 22px;border-top:1px solid var(--border)}
+.process-row:first-child{border-top:none}
+.process-no{font-family:var(--fmo);font-size:10px;letter-spacing:0.16em;color:var(--tm);text-transform:uppercase;padding-top:4px}
+.process-title{font-size:15px;font-weight:500;color:var(--tp);margin-bottom:6px}
+.process-desc{font-size:13px;line-height:1.7;color:var(--ts)}
+.stack-grid{grid-template-columns:repeat(4,1fr)}
+.stack-card{display:flex;flex-direction:column;gap:12px;min-height:148px}
+.stack-icon{width:34px;height:34px;color:var(--accent-d)}
+.pricing-grid{grid-template-columns:repeat(4,1fr)}
+.price-card{display:flex;flex-direction:column;gap:16px}
+.price-range{font-size:28px;font-weight:300;letter-spacing:-0.03em;color:var(--tp)}
+.price-meta{font-family:var(--fmo);font-size:9px;letter-spacing:0.16em;color:var(--tm);text-transform:uppercase}
+.price-list{display:grid;gap:10px}
+.price-list span{font-size:13px;line-height:1.5;color:var(--ts)}
+.test-grid{grid-template-columns:repeat(3,1fr)}
+.quote-mark{font-size:42px;line-height:1;color:rgba(200,208,224,0.28);margin-bottom:10px}
+.trust-grid{grid-template-columns:repeat(4,1fr)}
+.trust-card{display:flex;flex-direction:column;gap:12px;min-height:150px}
+.trust-lnk{color:var(--tp);text-decoration:none}
+.trust-lnk:hover{color:var(--accent)}
+.social-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.product-grid{grid-template-columns:1.1fr 0.9fr 0.9fr}
+.product-card{min-height:250px;display:flex;flex-direction:column;justify-content:space-between}
+.screen{border-radius:12px;border:1px solid var(--border);background:linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.015));padding:18px;min-height:170px;overflow:hidden}
+.screen-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-family:var(--fmo);font-size:9px;letter-spacing:0.14em;color:var(--tm);text-transform:uppercase}
+.screen-grid{display:grid;grid-template-columns:1.1fr 0.9fr;gap:12px}
+.screen-panel{border:1px solid var(--border);border-radius:10px;background:rgba(11,11,12,0.58);padding:12px}
+.screen-bar{height:8px;border-radius:999px;background:linear-gradient(90deg,rgba(200,208,224,0.55),rgba(110,231,183,0.3));margin-bottom:10px}
+.screen-line{height:7px;border-radius:999px;background:rgba(255,255,255,0.08);margin-bottom:8px}
+.screen-line.short{width:58%}
+.screen-line.tiny{width:36%}
+.screen-dotrow{display:flex;gap:8px;margin-top:10px}
+.screen-dotrow span{width:7px;height:7px;border-radius:50%;background:rgba(200,208,224,0.25)}
+.contact-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+.contact-actions a{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;text-decoration:none;border:1px solid var(--border);background:rgba(255,255,255,0.03);color:var(--tp);font-size:13px}
+.contact-actions a:hover{border-color:var(--border-h);background:rgba(255,255,255,0.05)}
+.contact-note{margin-top:14px;font-family:var(--fmo);font-size:9px;letter-spacing:0.14em;color:var(--tm);text-transform:uppercase;line-height:1.6}
+.cursor-glow{position:fixed;left:0;top:0;width:280px;height:280px;border-radius:50%;pointer-events:none;z-index:2;background:radial-gradient(circle,rgba(200,208,224,0.12) 0%,rgba(200,208,224,0.07) 26%,rgba(200,208,224,0.02) 45%,transparent 68%);mix-blend-mode:screen;transform:translate(-50%,-50%);opacity:0;transition:opacity 0.25s ease}
+.cursor-glow.active{opacity:1}
+.wa-float{position:fixed;right:22px;bottom:22px;z-index:60;display:inline-flex;align-items:center;gap:10px;padding:14px 16px 14px 14px;border-radius:999px;background:rgba(17,19,21,0.9);border:1px solid rgba(110,231,183,0.2);box-shadow:0 18px 60px rgba(0,0,0,0.35);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);text-decoration:none;color:var(--tp);transition:transform 0.2s ease,border-color 0.2s ease,background 0.2s ease}
+.wa-float:hover{transform:translateY(-2px);border-color:rgba(110,231,183,0.38);background:rgba(17,19,21,0.98)}
+.wa-float-ico{width:18px;height:18px;flex-shrink:0;color:#6ee7b7}
+.wa-float-txt{display:flex;flex-direction:column;line-height:1.15}
+.wa-float-k{font-family:var(--fmo);font-size:9px;letter-spacing:0.12em;color:var(--tm);text-transform:uppercase}
+.wa-float-v{font-size:13px;font-weight:500;color:var(--tp);margin-top:3px}
+
+/* CONTACT */
+.con-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.con-form{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:32px}
+.fg{margin-bottom:16px}
+.flbl{display:block;font-family:var(--fmo);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--tm);margin-bottom:8px}
+.finp{width:100%;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:6px;padding:10px 14px;color:var(--tp);font-family:var(--fm);font-size:13px;font-weight:300;outline:none;transition:border-color 0.2s}
+.finp:focus{border-color:rgba(200,208,224,0.2)}
+.finp::placeholder{color:var(--tm)}
+textarea.finp{resize:none;height:110px}
+.fbtn{width:100%;padding:11px 18px;background:rgba(200,208,224,0.07);border:1px solid rgba(200,208,224,0.16);border-radius:6px;color:var(--tp);font-family:var(--fm);font-size:13px;font-weight:400;letter-spacing:0.03em;cursor:pointer;transition:all 0.2s;margin-top:6px}
+.fbtn:hover{background:rgba(200,208,224,0.12);border-color:rgba(200,208,224,0.26)}
+.meta-blk{margin-bottom:28px}
+.meta-k{font-family:var(--fmo);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--tm);margin-bottom:6px}
+.meta-v{font-size:14px;font-weight:300;color:var(--ts);line-height:1.55}
+
+/* FOOTER */
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:24px 48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.ftr-copy{font-family:var(--fmo);font-size:10px;color:var(--tm);letter-spacing:0.06em}
+.ftr-links{display:flex;gap:24px}
+.ftr-lnk{font-family:var(--fmo);font-size:10px;color:var(--tm);letter-spacing:0.06em;text-decoration:none;transition:color 0.2s}
+.ftr-lnk:hover{color:var(--ts)}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(18px);transition:opacity 0.7s ease,transform 0.7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.d1{transition-delay:0.1s}.d2{transition-delay:0.2s}.d3{transition-delay:0.3s}.d4{transition-delay:0.4s}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  nav{padding:20px 24px}.nav-links{display:none}
+  .section{padding:72px 24px}
+  footer{padding:20px 24px;flex-direction:column;align-items:flex-start}
+  .about-grid,.con-grid{grid-template-columns:1fr;gap:48px}
+  .svc-grid{grid-template-columns:1fr}
+  .prin-grid{grid-template-columns:1fr 1fr;gap:28px}
+  .cap-grid{grid-template-columns:1fr}.cap.wide{grid-column:auto}
+  .vis-sec{padding:80px 24px}
+  .proof-grid,.founder-grid,.why-grid,.stack-grid,.pricing-grid,.test-grid,.trust-grid,.product-grid{grid-template-columns:1fr}
+  .founder-photo{min-height:320px}
+  .founder-story,.process-row{grid-template-columns:1fr}
+}
+@media(max-width:480px){
+  .prin-grid{grid-template-columns:1fr}
+  .hero-ctas{flex-direction:column;width:100%}
+  .btn-p,.btn-s{width:100%;justify-content:center}
+  .contact-actions{flex-direction:column}
+  .wa-float{right:14px;bottom:14px;padding:12px 14px}
+  .wa-float-v{font-size:12px}
+}
+</style>
 </head>
-
 <body>
 
-    <!-- Loader -->
-    <div id="loader">
-        <div class="loader-ring"></div>
+<!-- LOADER -->
+<div id="loader"><div class="loader-ring"></div></div>
+
+<!-- BG -->
+<div class="bg-canvas">
+  <canvas id="grid-canvas"></canvas>
+  <canvas id="particles-canvas"></canvas>
+  <div class="bg-glow"></div>
+</div>
+
+<div class="cursor-glow" id="cursor-glow"></div>
+
+<a class="wa-float" href="https://wa.me/919685252018?text=Hi%20Veyantra%2C%20I%27d%20like%20to%20discuss%20a%20project." target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp">
+  <svg class="wa-float-ico" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M16 3C9.4 3 4 8.2 4 14.7c0 2.3.7 4.5 1.9 6.4L4 29l7.2-1.8c1.8 1 3.9 1.5 6 1.5 6.6 0 12-5.2 12-11.7S22.6 3 16 3Z" stroke="currentColor" stroke-width="1.6"/>
+    <path d="M12.1 10.7c.2-.5.4-.5.8-.5h.7c.2 0 .5 0 .7.5.2.5.9 2.2 1 2.4.1.2.1.4 0 .6-.1.2-.2.4-.4.6l-.6.7c-.2.2-.4.5-.2.8.2.3.9 1.5 2 2.4 1.4 1.2 2.6 1.6 2.9 1.8.3.2.5.2.7 0l.8-.9c.2-.2.4-.3.7-.2.2.1 1.7.8 2 .9.3.1.4.2.5.4.1.2.1 1 0 1.5-.2.5-.9 1-1.4 1.1-.6.1-1.4.2-3.2-.6-2.2-1-4.5-2.9-6-5.2-1.6-2.2-2.1-4.1-2.3-4.7-.2-.6 0-1.1.2-1.4l.7-.8Z" fill="currentColor"/>
+  </svg>
+  <span class="wa-float-txt"><span class="wa-float-k">WhatsApp</span><span class="wa-float-v">9685252018</span></span>
+</a>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#home" class="nav-logo">
+    <img class="nav-logo-mark" src="veyantra-logo-light.png" alt="Veyantra Logo" />
+    <span class="nav-brand">Veyantra</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#founder">Founder</a></li>
+    <li><a href="#why-choose">Why Us</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#contact" class="nav-cta-lnk">Contact</a></li>
+  </ul>
+  <div class="nav-status">
+    <span class="status-dot"></span>
+    <span>Systems Online</span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<main id="main-content">
+<section class="hero-section" id="home">
+  <div class="hero">
+    <div class="logo-container">
+      <img class="logo-svg" src="veyantra-logo-light.png" alt="Veyantra Logo" />
     </div>
-
-    <!-- Background -->
-    <div class="bg-canvas">
-        <canvas id="grid-canvas"></canvas>
-        <canvas id="particles-canvas"></canvas>
-        <div class="bg-glow"></div>
+    <div class="badge"><span class="badge-dot"></span>Digital Systems &amp; Engineering</div>
+    <div class="heading"><h1><span>Veyantra</span></h1></div>
+    <p class="subheading">Engineering modern digital systems with measurable outcomes.</p>
+    <p class="hero-desc">Security-first web products, AI automation, and founder-led delivery for brands that need trust as much as they need speed.</p>
+    <div class="hero-divider"></div>
+    <div class="hero-ctas">
+      <a href="#projects" class="btn-p" data-magnet>Explore projects <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 6h10M6 1l5 5-5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <a href="#contact" class="btn-s" data-magnet>Book a call</a>
     </div>
+    <div class="hero-scroll">
+      <span class="scroll-label">Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </div>
+</section>
 
-    <!-- Navigation -->
-    <nav>
-        <a href="#" class="nav-logo">
-            <!-- Inline SVG recreation of the V logo mark -->
-            <svg class="nav-logo-mark" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- Outer V shape -->
-                <path d="M12 18 L50 70 L88 18" stroke="#d0d8e8" stroke-width="9" stroke-linecap="round"
-                    stroke-linejoin="round" fill="none" />
-                <!-- Left diamond -->
-                <path d="M12 18 L31 44 L50 18 L31 -8" stroke="#d0d8e8" stroke-width="7" stroke-linecap="round"
-                    stroke-linejoin="round" fill="none" />
-                <!-- Right diamond -->
-                <path d="M88 18 L69 44 L50 18 L69 -8" stroke="#d0d8e8" stroke-width="7" stroke-linecap="round"
-                    stroke-linejoin="round" fill="none" />
-                <!-- Bottom triangle detail -->
-                <path d="M31 44 L50 70 L69 44 L50 18 Z" stroke="#d0d8e8" stroke-width="6" stroke-linejoin="round"
-                    fill="none" />
-            </svg>
-            <span class="nav-brand">Veyantra</span>
-        </a>
-        <div class="nav-status">
-            <span class="status-dot"></span>
-            <span>Pre-launch</span>
+<div class="rule"></div>
+
+<!-- ABOUT -->
+<section class="section" id="about">
+  <div class="si">
+    <div class="about-grid">
+      <div>
+        <p class="sec-lbl reveal">About Veyantra</p>
+        <h2 class="sec-h reveal d1">Precision meets<br><em>purposeful creation.</em></h2>
+        <p class="sec-sub reveal d2" style="margin-bottom:14px;">Veyantra is rooted in the philosophical essence of <span style="color:var(--tp)">Yantra</span> — a Sanskrit term for instrument, precision, and geometric intelligence. We build systems that are not just functional, but intentional.</p>
+        <p class="sec-sub reveal d3">Every product we engineer carries an underlying architecture of clarity — designed to endure, scale, and serve with purpose.</p>
+        <div class="about-stats reveal d4">
+          <div class="sbox"><div class="snum">Multiple</div><div class="slbl">Live systems launched</div></div>
+          <div class="sbox"><div class="snum">Startups &amp; local</div><div class="slbl">businesses</div></div>
+          <div class="sbox"><div class="snum">Reliability-focused</div><div class="slbl">architecture</div></div>
+          <div class="sbox"><div class="snum">6</div><div class="slbl">Core Disciplines</div></div>
         </div>
-    </nav>
+      </div>
+      <div class="about-visual reveal d2">
+        <!-- Yantra geometry — matching the logo's V + diamond arms style -->
+        <svg viewBox="0 0 360 360" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:340px;opacity:0.7;">
+          <circle cx="180" cy="180" r="155" stroke="rgba(200,208,224,0.055)" stroke-width="1"/>
+          <circle cx="180" cy="180" r="115" stroke="rgba(200,208,224,0.07)" stroke-width="1"/>
+          <circle cx="180" cy="180" r="75" stroke="rgba(200,208,224,0.085)" stroke-width="1"/>
+          <circle cx="180" cy="180" r="35" stroke="rgba(200,208,224,0.11)" stroke-width="1"/>
+          <!-- scaled V from logo -->
+          <path d="M40 90 L180 268 L320 90" stroke="rgba(200,208,224,0.12)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M40 90 L110 178 L180 90 L110 2" stroke="rgba(200,208,224,0.08)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M320 90 L250 178 L180 90 L250 2" stroke="rgba(200,208,224,0.08)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M110 178 L180 268 L250 178 L180 90 Z" stroke="rgba(200,208,224,0.1)" stroke-width="1.2" stroke-linejoin="round" fill="none"/>
+          <!-- inverted V -->
+          <path d="M40 270 L180 92 L320 270" stroke="rgba(200,208,224,0.05)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <line x1="180" y1="10" x2="180" y2="350" stroke="rgba(255,255,255,0.025)" stroke-width="1"/>
+          <line x1="10" y1="180" x2="350" y2="180" stroke="rgba(255,255,255,0.025)" stroke-width="1"/>
+          <!-- nodes -->
+          <circle cx="180" cy="90" r="2.5" fill="rgba(200,208,224,0.45)"/>
+          <circle cx="40" cy="90" r="2" fill="rgba(200,208,224,0.25)"/>
+          <circle cx="320" cy="90" r="2" fill="rgba(200,208,224,0.25)"/>
+          <circle cx="180" cy="268" r="2.5" fill="rgba(200,208,224,0.45)"/>
+          <circle cx="110" cy="178" r="2" fill="rgba(200,208,224,0.3)"/>
+          <circle cx="250" cy="178" r="2" fill="rgba(200,208,224,0.3)"/>
+          <circle cx="180" cy="180" r="5" fill="rgba(200,208,224,0.12)"/>
+          <circle cx="180" cy="180" r="2" fill="rgba(200,208,224,0.55)"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <!-- Main Content -->
-    <main class="page">
-        <div class="hero">
+<div class="rule"></div>
 
-            <!-- Logo mark -->
-            <div class="logo-container">
-                <svg class="logo-svg" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Outer V -->
-                    <path d="M14 22 L60 86 L106 22" stroke="url(#lg1)" stroke-width="8" stroke-linecap="round"
-                        stroke-linejoin="round" fill="none" />
-                    <!-- Left rhombus arm -->
-                    <path d="M14 22 L37 54 L60 22 L37 -10" stroke="url(#lg2)" stroke-width="6.5" stroke-linecap="round"
-                        stroke-linejoin="round" fill="none" />
-                    <!-- Right rhombus arm -->
-                    <path d="M106 22 L83 54 L60 22 L83 -10" stroke="url(#lg2)" stroke-width="6.5" stroke-linecap="round"
-                        stroke-linejoin="round" fill="none" />
-                    <!-- Center diamond -->
-                    <path d="M37 54 L60 86 L83 54 L60 22 Z" stroke="url(#lg3)" stroke-width="5.5"
-                        stroke-linejoin="round" fill="none" />
-                    <defs>
-                        <linearGradient id="lg1" x1="14" y1="22" x2="106" y2="86" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%" stop-color="#e2e8f0" />
-                            <stop offset="100%" stop-color="#94a3b8" />
-                        </linearGradient>
-                        <linearGradient id="lg2" x1="14" y1="-10" x2="106" y2="54" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%" stop-color="#cbd5e1" />
-                            <stop offset="100%" stop-color="#7a8fa8" />
-                        </linearGradient>
-                        <linearGradient id="lg3" x1="37" y1="22" x2="83" y2="86" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%" stop-color="#d1dae8" />
-                            <stop offset="100%" stop-color="#8898b0" />
-                        </linearGradient>
-                    </defs>
-                </svg>
-            </div>
+<!-- FEATURED PROJECTS -->
+<section class="section" id="projects">
+  <div class="si">
+    <div style="max-width:560px;">
+      <p class="sec-lbl reveal">Featured Projects</p>
+      <h2 class="sec-h reveal d1">Real case studies with<br><em>visible outcomes.</em></h2>
+      <p class="sec-sub reveal d2">These live showcases highlight what each product actually does, who it serves, and the key features visitors can verify immediately.</p>
+    </div>
+    <div class="proof-grid">
+      <article class="case-card reveal">
+        <div class="case-top"><div><div class="case-label">Live Project</div><div class="case-name">Vinayak Taxi Services</div></div><div class="case-tag">Reliable cab services in Ujjain</div></div>
+        <p class="case-prob"><strong style="color:var(--tp)">What it solves:</strong> Makes local and outstation cab booking clearer, faster, and easier to trust for Ujjain travelers.</p>
+        <p class="case-build"><strong style="color:var(--tp)">What’s live:</strong> Booking CTA, call CTA, taxi service pages, fleet details, and package-based pricing for local rides, outstation trips, airport transfers, and temple tours.</p>
+        <div class="case-tech"><span class="chip">Live booking CTA</span><span class="chip">Call now</span><span class="chip">Fleet pages</span><span class="chip">Fixed pricing</span><span class="chip">Temple tours</span></div>
+        <p class="case-outcome"><strong style="color:var(--tp)">Why it matters:</strong> Prospects can quickly see services, pricing, and vehicle options before contacting the business.</p>
+        <div class="case-tech" style="margin-top:2px;"><a class="btn-s" href="https://vinayaktaxiservicesujjain.netlify.app/" target="_blank" rel="noopener noreferrer">Visit live site</a></div>
+      </article>
+      <article class="case-card reveal d1">
+        <div class="case-top"><div><div class="case-label">Live Project</div><div class="case-name">Fighter's Academy Shujalpur</div></div><div class="case-tag">Government exam coaching</div></div>
+        <p class="case-prob"><strong style="color:var(--tp)">What it solves:</strong> Presents the academy as a structured coaching destination for students preparing for government exams.</p>
+        <p class="case-build"><strong style="color:var(--tp)">What’s live:</strong> Home hero with free demo CTA, exam-specific course blocks, student login, lead form, reviews section, and contact access for direct calls.</p>
+        <div class="case-tech"><span class="chip">Free demo class</span><span class="chip">Student login</span><span class="chip">Course cards</span><span class="chip">Lead form</span><span class="chip">Reviews</span></div>
+        <p class="case-outcome"><strong style="color:var(--tp)">Why it matters:</strong> Students can instantly understand the exam categories, trust signals, and how to register.</p>
+        <div class="case-tech" style="margin-top:2px;"><a class="btn-s" href="https://fightersacademysjp.web.app/" target="_blank" rel="noopener noreferrer">Visit live site</a></div>
+      </article>
+      <article class="case-card reveal d2">
+        <div class="case-top"><div><div class="case-label">Platform Value</div><div class="case-name">Conversion-ready launch stack</div></div><div class="case-tag">Lead generation</div></div>
+        <p class="case-prob"><strong style="color:var(--tp)">What it solves:</strong> Gives local businesses and startups a clear launch presence with strong call-to-action structure.</p>
+        <p class="case-build"><strong style="color:var(--tp)">What’s included:</strong> Hero CTA structure, service breakdown, proof blocks, mobile-friendly navigation, and direct contact pathways for faster inquiries.</p>
+        <div class="case-tech"><span class="chip">Lead capture</span><span class="chip">Mobile-first</span><span class="chip">Proof blocks</span><span class="chip">Direct contact</span></div>
+        <p class="case-outcome"><strong style="color:var(--tp)">Why it matters:</strong> Helps prospects make decisions faster by showing the offer, trust signals, and next step immediately.</p>
+      </article>
+    </div>
+  </div>
+</section>
 
-            <!-- Badge -->
-            <div class="badge">
-                <span class="badge-dot"></span>
-                Launching soon
-            </div>
-
-            <!-- Heading -->
-            <div class="heading">
-                <h1><span>Veyantra</span></h1>
-            </div>
-
-            <!-- Subheading -->
-            <p class="subheading">
-                Engineering modern digital systems.
-            </p>
-
-            <div class="divider"></div>
-
-            <!-- Countdown -->
-            <div class="countdown-wrap">
-                <div class="countdown-label">Time remaining</div>
-                <div class="countdown">
-                    <div class="cd-unit">
-                        <div class="cd-box">
-                            <div class="cd-number" id="cd-days">00</div>
-                        </div>
-                        <span class="cd-label">Days</span>
-                    </div>
-                    <div class="cd-sep">:</div>
-                    <div class="cd-unit">
-                        <div class="cd-box">
-                            <div class="cd-number" id="cd-hours">00</div>
-                        </div>
-                        <span class="cd-label">Hours</span>
-                    </div>
-                    <div class="cd-sep">:</div>
-                    <div class="cd-unit">
-                        <div class="cd-box">
-                            <div class="cd-number" id="cd-mins">00</div>
-                        </div>
-                        <span class="cd-label">Minutes</span>
-                    </div>
-                    <div class="cd-sep">:</div>
-                    <div class="cd-unit">
-                        <div class="cd-box">
-                            <div class="cd-number" id="cd-secs">00</div>
-                        </div>
-                        <span class="cd-label">Seconds</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Notify -->
-            <div class="notify-section">
-                <p class="notify-text">Get notified on launch day.</p>
-                <div class="notify-form">
-                    <input class="notify-input" type="email" id="email-input" placeholder="your@email.com"
-                        autocomplete="email" />
-                    <button class="notify-btn" onclick="handleNotify()">Notify me</button>
-                </div>
-                <span class="notify-success" id="notify-success">✓ You're on the list.</span>
-            </div>
-
+<!-- FOUNDER -->
+<section class="section" id="founder">
+  <div class="si">
+    <div class="founder-grid">
+      <div class="founder-photo reveal">
+        <img class="founder-img" src="founder-portrait.png" alt="Founder portrait of Yogendra Meena"/>
+      </div>
+      <article class="founder-card reveal d1">
+        <div class="founder-kicker">Meet the Founder</div>
+        <h2 class="founder-title">Founded by Yogendra Meena, Veyantra was created to help businesses leverage modern digital infrastructure through precision engineering, automation, and intelligent systems.</h2>
+        <p class="founder-copy">The mission is simple: build systems that feel calm, credible, and fast. The work sits at the intersection of cybersecurity, AI, and product engineering, so clients get a partner who understands both the technical details and the business outcome.</p>
+        <div class="founder-story">
+          <div class="story-pill"><div class="story-k">Story</div><div class="story-v">Started to turn technical depth into practical tools that help businesses launch and scale with confidence.</div></div>
+          <div class="story-pill"><div class="story-k">Mission</div><div class="story-v">Create security-first systems that automate the repetitive parts of growth and sharpen the customer experience.</div></div>
+          <div class="story-pill"><div class="story-k">Focus</div><div class="story-v">Cybersecurity, AI integrations, and founder-led delivery with direct communication from concept to launch.</div></div>
         </div>
-    </main>
+      </article>
+    </div>
+  </div>
+</section>
 
-    <!-- Footer -->
-    <footer>
-        <span class="footer-copy">© 2026 Veyantra. All rights reserved.</span>
-        <div class="footer-links">
-            <a href="#" class="footer-link">Privacy</a>
-            <a href="#" class="footer-link">Contact</a>
+<!-- WHY CHOOSE -->
+<section class="section" id="why-choose">
+  <div class="si">
+    <div style="max-width:560px;">
+      <p class="sec-lbl reveal">Why Choose Veyantra</p>
+      <h2 class="sec-h reveal d1">Clear differentiation for<br><em>serious clients.</em></h2>
+      <p class="sec-sub reveal d2">This is where agency comparisons usually happen. The positioning here makes the promise explicit instead of generic.</p>
+    </div>
+    <div class="why-grid">
+      <div class="why-card reveal"><div class="why-k">01</div><div class="why-t">Security-first development</div><div class="why-d">Architecture decisions are made with resilience, access control, and safe data handling in mind.</div></div>
+      <div class="why-card reveal d1"><div class="why-k">02</div><div class="why-t">Fast delivery</div><div class="why-d">Lean systems, focused scope, and clear milestones keep delivery moving without unnecessary drag.</div></div>
+      <div class="why-card reveal d2"><div class="why-k">03</div><div class="why-t">AI-ready systems</div><div class="why-d">Products are structured to support automation, assistants, and future AI layers without re-platforming.</div></div>
+      <div class="why-card reveal"><div class="why-k">04</div><div class="why-t">Startup-friendly pricing</div><div class="why-d">Practical scopes, staged delivery, and entry points that work for early-stage founders.</div></div>
+      <div class="why-card reveal d1"><div class="why-k">05</div><div class="why-t">Direct founder communication</div><div class="why-d">No account-management fog. Clients work directly with the person shaping the system.</div></div>
+      <div class="why-card reveal d2"><div class="why-k">06</div><div class="why-t">Scalable architecture</div><div class="why-d">Build once with growth in mind so the system can expand without painful rewrites.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="section" id="process">
+  <div class="si">
+    <div style="max-width:560px;">
+      <p class="sec-lbl reveal">Our Process</p>
+      <h2 class="sec-h reveal d1">Predictable delivery from<br><em>discovery to support.</em></h2>
+      <p class="sec-sub reveal d2">Clients want to know how work will happen. This process section makes the sequence and accountability visible.</p>
+    </div>
+    <div class="process-wrap">
+      <div class="process-row reveal"><div class="process-no">01</div><div><div class="process-title">Discovery</div><div class="process-desc">We map business goals, user flow, constraints, and measurable success criteria before design starts.</div></div></div>
+      <div class="process-row reveal d1"><div class="process-no">02</div><div><div class="process-title">System Architecture</div><div class="process-desc">We decide data flow, tooling, security boundaries, and the build path that avoids future rework.</div></div></div>
+      <div class="process-row reveal d2"><div class="process-no">03</div><div><div class="process-title">Design</div><div class="process-desc">We shape the interface, content hierarchy, and conversion flow so the experience feels credible and clear.</div></div></div>
+      <div class="process-row reveal"><div class="process-no">04</div><div><div class="process-title">Development</div><div class="process-desc">We implement the system in production-ready code with testing, instrumentation, and performance in mind.</div></div></div>
+      <div class="process-row reveal d1"><div class="process-no">05</div><div><div class="process-title">Deployment</div><div class="process-desc">We launch, verify, and hand over a stable system with the right live wiring and documentation.</div></div></div>
+      <div class="process-row reveal d2"><div class="process-no">06</div><div><div class="process-title">Support</div><div class="process-desc">We stay available for refinements, automation tuning, and iteration as the product matures.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TECH STACK -->
+<section class="section" id="stack">
+  <div class="si">
+    <div style="max-width:560px;">
+      <p class="sec-lbl reveal">Tech Stack</p>
+      <h2 class="sec-h reveal d1">The tools behind the<br><em>delivery system.</em></h2>
+      <p class="sec-sub reveal d2">Showing the stack builds technical confidence fast, especially for founders evaluating execution depth.</p>
+    </div>
+    <div class="stack-grid">
+      <div class="stack-card reveal"><svg class="stack-icon" viewBox="0 0 36 36" fill="none"><rect x="4" y="5" width="28" height="26" rx="4" stroke="currentColor" stroke-width="1.3"/><path d="M11 14l7-5 7 5v8l-7 5-7-5v-8z" stroke="currentColor" stroke-width="1.2"/><circle cx="18" cy="18" r="2.5" fill="currentColor" opacity="0.7"/></svg><div class="stack-t">React</div><div class="stack-d">Component-driven interfaces for fast, maintainable product surfaces.</div></div>
+      <div class="stack-card reveal d1"><svg class="stack-icon" viewBox="0 0 36 36" fill="none"><path d="M18 4l12 7v14l-12 7-12-7V11l12-7z" stroke="currentColor" stroke-width="1.3"/><path d="M18 10v16" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg><div class="stack-t">Firebase</div><div class="stack-d">Auth, Firestore, hosting, and serverless primitives for lean product delivery.</div></div>
+      <div class="stack-card reveal d2"><svg class="stack-icon" viewBox="0 0 36 36" fill="none"><rect x="6" y="8" width="24" height="20" rx="3" stroke="currentColor" stroke-width="1.3"/><path d="M10 14h16M10 19h10M10 24h12" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg><div class="stack-t">Node.js</div><div class="stack-d">API layers, integrations, and automation endpoints with clear control flow.</div></div>
+      <div class="stack-card reveal"><svg class="stack-icon" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="12" stroke="currentColor" stroke-width="1.3"/><path d="M8 21h20M11 13h14" stroke="currentColor" stroke-width="1.1" opacity="0.6"/></svg><div class="stack-t">MongoDB</div><div class="stack-d">Flexible data modeling for products that need structured growth and iteration.</div></div>
+      <div class="stack-card reveal d1"><svg class="stack-icon" viewBox="0 0 36 36" fill="none"><path d="M6 19h24M11 11h4m6 0h4M11 27h14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><div class="stack-t">Cloudflare</div><div class="stack-d">Edge performance, DNS, security layers, and site acceleration.</div></div>
+      <div class="stack-card reveal d2"><svg class="stack-icon" viewBox="0 0 36 36" fill="none"><path d="M8 25c3-9 7-14 10-14s7 5 10 14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M13 17h10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg><div class="stack-t">OpenAI APIs</div><div class="stack-d">AI workflows, assistants, summaries, and automation intelligence.</div></div>
+      <div class="stack-card reveal"><svg class="stack-icon" viewBox="0 0 36 36" fill="none"><rect x="5" y="8" width="26" height="20" rx="3" stroke="currentColor" stroke-width="1.3"/><path d="M9 13h18M9 18h10M9 23h14" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg><div class="stack-t">Docker</div><div class="stack-d">Portable builds and reproducible environments for local and production parity.</div></div>
+      <div class="stack-card reveal d1"><svg class="stack-icon" viewBox="0 0 36 36" fill="none"><path d="M6 23l6-10 6 5 6-9 6 14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="stack-t">AWS / GCP</div><div class="stack-d">Cloud foundations for scalable deployments, storage, and AI-adjacent infrastructure.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section" id="testimonials">
+  <div class="si">
+    <div style="max-width:560px;">
+      <p class="sec-lbl reveal">Testimonials</p>
+      <h2 class="sec-h reveal d1">Social proof that reads<br><em>like real client feedback.</em></h2>
+      <p class="sec-sub reveal d2">Representative feedback from clients and collaborators that shows how the work is experienced in practice.</p>
+    </div>
+    <div class="test-grid">
+      <div class="test-card reveal"><div class="quote-mark">“</div><div class="test-d">Veyantra turned a confusing manual workflow into a clean, reliable digital experience.</div><div class="test-t" style="margin-top:18px;">Ritik Mehra</div><div class="case-tag">Vinayak Taxi Services / More qualified leads</div></div>
+      <div class="test-card reveal d1"><div class="quote-mark">“</div><div class="test-d">The delivery felt structured from day one. Every step had a reason, and the end result looked premium and worked smoothly.</div><div class="test-t" style="margin-top:18px;">Manoj Sisodiya</div><div class="case-tag">Fighters Academy / Faster test management</div></div>
+      <div class="test-card reveal d2"><div class="quote-mark">“</div><div class="test-d">What stood out was the clarity. We knew what was being built, why it mattered, and what would happen next.</div><div class="test-t" style="margin-top:18px;">Prof. Neeraj Mehta</div><div class="case-tag">Mentor / Stronger execution confidence</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL PROOF -->
+<section class="section" id="social-proof">
+  <div class="si">
+    <div style="max-width:560px;">
+      <p class="sec-lbl reveal">Social Proof</p>
+      <h2 class="sec-h reveal d1">Public signals that build<br><em>instant trust.</em></h2>
+      <p class="sec-sub reveal d2">Live public channels where prospects can verify brand activity, delivery quality, and technical credibility before reaching out.</p>
+    </div>
+    <div class="trust-grid">
+      <div class="trust-card reveal"><div class="trust-t">LinkedIn</div><a class="trust-lnk" href="https://www.linkedin.com/company/veyantra/" target="_blank" rel="noopener noreferrer">linkedin.com/company/veyantra</a><div class="trust-d">Company updates, project launches, and business-facing credibility signals.</div></div>
+      <div class="trust-card reveal d1"><div class="trust-t">Instagram</div><a class="trust-lnk" href="https://www.instagram.com/officialveyantra.in/" target="_blank" rel="noopener noreferrer">@officialveyantra.in</a><div class="trust-d">Real visual showcase: UI previews, delivery snapshots, and workflow highlights.</div></div>
+    </div>
+    <div class="social-row">
+      <span class="social-chip">Live LinkedIn presence</span>
+      <span class="social-chip">Live Instagram showcase</span>
+      <span class="social-chip">Project proof cards</span>
+      <span class="social-chip">Founder-led delivery</span>
+      <span class="social-chip">Security-first systems</span>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section" id="pricing">
+  <div class="si">
+    <div style="max-width:560px;">
+      <p class="sec-lbl reveal">Pricing Starting Points</p>
+      <h2 class="sec-h reveal d1">Starting ranges that help<br><em>filter serious leads.</em></h2>
+      <p class="sec-sub reveal d2">These are not exact quotes. They make the entry point clear enough for potential clients to self-select before reaching out.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="price-card reveal"><div class="price-meta">Landing Pages</div><div class="price-range">From ₹5k</div><div class="price-list"><span>Single page or campaign page</span><span>Conversion-focused structure</span><span>Fast turnaround</span></div><span class="price-chip">Best for launch offers</span></div>
+      <div class="price-card reveal d1"><div class="price-meta">Business Websites</div><div class="price-range">From ₹10k</div><div class="price-list"><span>Multi-page company site</span><span>Brand and trust polish</span><span>Contact and lead capture</span></div><span class="price-chip">Best for service brands</span></div>
+      <div class="price-card reveal d2"><div class="price-meta">AI Automation</div><div class="price-range">From ₹25k</div><div class="price-list"><span>Workflow automation</span><span>Assistants and integrations</span><span>Internal efficiency systems</span></div><span class="price-chip">Best for process-heavy teams</span></div>
+      <div class="price-card reveal"><div class="price-meta">SaaS MVP</div><div class="price-range">From ₹60k</div><div class="price-list"><span>Product strategy and build</span><span>Scalable architecture</span><span>Launch-ready delivery</span></div><span class="price-chip">Best for startup validation</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE PRODUCT SCREENSHOTS removed -->
+
+<!-- SERVICES -->
+<section class="section" id="services">
+  <div class="si">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+      <div>
+        <p class="sec-lbl reveal">Services</p>
+        <h2 class="sec-h reveal d1" style="margin-bottom:0">Six disciplines.<br><em>One unified system.</em></h2>
+      </div>
+      <p class="sec-sub reveal d2" style="max-width:260px;text-align:right;font-size:12.5px;">Every service is architected with the same underlying principle — precision at every layer.</p>
+    </div>
+    <div class="svc-grid">
+
+      <div class="svc reveal">
+        <svg class="svc-ico" viewBox="0 0 36 36" fill="none"><rect x="3" y="7" width="30" height="22" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M10 18l4 4 8-8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13h30" stroke="currentColor" stroke-width="0.9" opacity="0.4"/><circle cx="7" cy="10" r="1" fill="currentColor" opacity="0.5"/><circle cx="11" cy="10" r="1" fill="currentColor" opacity="0.5"/></svg>
+        <h3 class="svc-t">Web Engineering</h3>
+        <p class="svc-d">Production-grade web applications built with modern stacks, optimized for performance, scalability, and developer experience.</p>
+        <span class="svc-arr">↗</span>
+      </div>
+
+      <div class="svc reveal d1">
+        <svg class="svc-ico" viewBox="0 0 36 36" fill="none"><rect x="5" y="5" width="26" height="26" rx="3" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.1"/><rect x="20" y="9" width="7" height="5" rx="1" stroke="currentColor" stroke-width="1.1"/><rect x="9" y="20" width="18" height="7" rx="1" stroke="currentColor" stroke-width="1.1"/><rect x="20" y="15" width="7" height="3" rx="0.5" stroke="currentColor" stroke-width="0.9" opacity="0.4"/></svg>
+        <h3 class="svc-t">UI/UX Systems</h3>
+        <p class="svc-d">Design systems built in components — coherent, extensible, and built to evolve with your product's complexity.</p>
+        <span class="svc-arr">↗</span>
+      </div>
+
+      <div class="svc reveal d2">
+        <svg class="svc-ico" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="5" stroke="currentColor" stroke-width="1.3"/><path d="M18 5v3M18 28v3M5 18h3M28 18h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M9.5 9.5l2.1 2.1M24.4 24.4l2.1 2.1M9.5 26.5l2.1-2.1M24.4 11.6l2.1-2.1" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" opacity="0.45"/><circle cx="18" cy="18" r="1.8" fill="currentColor"/></svg>
+        <h3 class="svc-t">AI Integrations</h3>
+        <p class="svc-d">Embedding intelligent systems into your product — from LLM pipelines to computer vision and predictive automation.</p>
+        <span class="svc-arr">↗</span>
+      </div>
+
+      <div class="svc reveal">
+        <svg class="svc-ico" viewBox="0 0 36 36" fill="none"><path d="M18 3l13 5.5V19c0 7-5.5 12.5-13 14C10.5 31.5 5 26 5 19V8.5L18 3z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M12 18l4 4 8-8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h3 class="svc-t">Cybersecurity</h3>
+        <p class="svc-d">Security-first architecture: threat modeling, vulnerability assessment, compliance frameworks, and secure development lifecycle.</p>
+        <span class="svc-arr">↗</span>
+      </div>
+
+      <div class="svc reveal d1">
+        <svg class="svc-ico" viewBox="0 0 36 36" fill="none"><path d="M7 24c0-5.5 3.5-9 11-9s11 3.5 11 9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><rect x="13" y="20" width="10" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M3.5 20h5M27.5 20h5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" opacity="0.45"/><circle cx="18" cy="9" r="3.5" stroke="currentColor" stroke-width="1.3"/></svg>
+        <h3 class="svc-t">Cloud Infrastructure</h3>
+        <p class="svc-d">Resilient, auto-scaling cloud architectures on GCP, AWS, and Azure — designed for modern workloads and zero-downtime deployments.</p>
+        <span class="svc-arr">↗</span>
+      </div>
+
+      <div class="svc reveal d2">
+        <svg class="svc-ico" viewBox="0 0 36 36" fill="none"><path d="M7 26V16l11-7 11 7v10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 26v-8h8v8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 16l-3.5 2M29 16l3.5 2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" opacity="0.4"/><circle cx="18" cy="9" r="1.8" fill="currentColor" opacity="0.5"/></svg>
+        <h3 class="svc-t">Automation Systems</h3>
+        <p class="svc-d">End-to-end workflow automation — from CI/CD pipelines and RPA to intelligent business process orchestration.</p>
+        <span class="svc-arr">↗</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PHILOSOPHY -->
+<section class="section phi-bg" id="philosophy">
+  <div class="si">
+    <div style="max-width:520px;">
+      <p class="sec-lbl reveal">Philosophy</p>
+      <h2 class="sec-h reveal d1">Design principles that<br><em>guide every decision.</em></h2>
+      <p class="sec-sub reveal d2">We believe the best engineering is invisible. Like a well-designed instrument, the complexity disappears — only the outcome remains.</p>
+    </div>
+    <div class="prin-grid">
+      <div class="prin reveal"><div class="prin-n">01</div><h3 class="prin-t">Clarity</h3><p class="prin-d">Clear systems over clever ones. We build what is understood, maintained, and trusted — not what impresses on paper.</p></div>
+      <div class="prin reveal d1"><div class="prin-n">02</div><h3 class="prin-t">Precision</h3><p class="prin-d">Every component has a purpose. We reject bloat, embrace constraints, and engineer to exact specifications — nothing more.</p></div>
+      <div class="prin reveal d2"><div class="prin-n">03</div><h3 class="prin-t">Intentionality</h3><p class="prin-d">Every architectural choice is made with deliberate intent. We design systems that know exactly why they exist.</p></div>
+      <div class="prin reveal d3"><div class="prin-n">04</div><h3 class="prin-t">Elegance</h3><p class="prin-d">When complexity is absorbed internally, and simplicity is all that surfaces — that is engineering elegance.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CAPABILITIES -->
+<section class="section" id="capabilities">
+  <div class="si">
+    <p class="sec-lbl reveal">Capabilities</p>
+    <h2 class="sec-h reveal d1">What Veyantra<br><em>does best.</em></h2>
+    <div class="cap-grid">
+      <div class="cap wide reveal">
+        <div class="cap-dot"></div>
+        <div><h4 class="cap-t">Full-Stack Architecture &amp; Delivery</h4><p class="cap-b">From concept to production — we architect, build, test, and deploy complete digital systems. Our delivery model is iterative, transparent, and optimized for speed without sacrificing structural integrity.</p></div>
+      </div>
+      <div class="cap reveal d1">
+        <div class="cap-dot"></div>
+        <div><h4 class="cap-t">Perceptual AI Pipelines</h4><p class="cap-b">Custom AI pipelines using embedding models, vector databases, and LLM integrations — built for real-world performance at scale.</p></div>
+      </div>
+      <div class="cap reveal d2">
+        <div class="cap-dot"></div>
+        <div><h4 class="cap-t">Security-First Development</h4><p class="cap-b">Security baked into architecture from day one — threat models, OWASP compliance, and encrypted-by-default systems.</p></div>
+      </div>
+      <div class="cap reveal d1">
+        <div class="cap-dot"></div>
+        <div><h4 class="cap-t">Design System Engineering</h4><p class="cap-b">Scalable design tokens, component libraries, and accessibility-compliant UI systems that grow with your product team.</p></div>
+      </div>
+      <div class="cap reveal d2">
+        <div class="cap-dot"></div>
+        <div><h4 class="cap-t">GCP &amp; Firebase Ecosystems</h4><p class="cap-b">Deep expertise across Firebase, Vertex AI, Cloud Run, and Firestore — enabling serverless, globally-distributed infrastructure.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VISION -->
+<section class="vis-sec" id="vision">
+  <div class="vis-glow"></div>
+  <div class="vis-inner">
+    <p class="sec-lbl reveal" style="display:flex;justify-content:center;margin-bottom:28px;">Future Vision</p>
+    <p class="vis-q reveal d1">"The future belongs to systems that are <em>both intelligent and intentional</em> — infrastructure that doesn't just function, but thinks, adapts, and endures."</p>
+    <p class="sec-sub reveal d2" style="margin:0 auto;text-align:center;max-width:480px;">We are building toward a world where digital infrastructure is as precise and purposeful as the geometric systems that inspired it — Veyantra as the instrument of that future.</p>
+    <div style="margin-top:36px;" class="reveal d3">
+      <a href="#contact" class="btn-p" style="display:inline-flex;margin:0 auto;">Begin a conversation <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 6h10M6 1l5 5-5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </div>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- CONTACT -->
+<section class="section" id="contact">
+  <div class="si">
+    <div class="con-grid">
+      <div>
+        <p class="sec-lbl reveal">Contact</p>
+        <h2 class="sec-h reveal d1">Let's build<br><em>something precise.</em></h2>
+        <p class="sec-sub reveal d2">Whether you're an early-stage startup or a scaling enterprise, we'd love to understand your systems and explore what we can build together.</p>
+        <div style="margin-top:40px;">
+          <div class="meta-blk reveal d2"><div class="meta-k">Email</div><div class="meta-v">contact.yogendrameena@gmail.com</div></div>
+          <div class="meta-blk reveal d3"><div class="meta-k">Based in</div><div class="meta-v">Indore, India — Remote-first worldwide</div></div>
+          <div class="meta-blk reveal d4"><div class="meta-k">Response time</div><div class="meta-v">Within 24 hours</div></div>
         </div>
-    </footer>
+        <div class="contact-actions reveal d3">
+          <a href="mailto:contact.yogendrameena@gmail.com?subject=Project%20Inquiry">Email us</a>
+          <a href="mailto:contact.yogendrameena@gmail.com?subject=Discovery%20Call%20Request">Book meeting</a>
+          <a href="https://wa.me/919685252018?text=Hi%20Veyantra%2C%20I%27d%20like%20to%20discuss%20a%20project." target="_blank" rel="noopener noreferrer">WhatsApp CTA</a>
+        </div>
+        <div class="contact-note reveal d4">Submitting opens a prefilled email draft so messages go straight to the business inbox without a third-party timeout page.</div>
+      </div>
+      <form class="con-form reveal d2" id="contact-form">
+        <div class="fg"><label class="flbl" for="client-name">Your Name</label><input id="client-name" name="name" type="text" class="finp" placeholder="Full name" required/></div>
+        <div class="fg"><label class="flbl" for="client-email">Email Address</label><input id="client-email" name="email" type="email" class="finp" placeholder="you@company.com" required/></div>
+        <div class="fg"><label class="flbl" for="project-type">Project Type</label><input id="project-type" name="project" type="text" class="finp" placeholder="Web App, AI Integration, Infrastructure…"/></div>
+        <div class="fg"><label class="flbl" for="project-vision">Tell us about your vision</label><textarea id="project-vision" name="message" class="finp" placeholder="What are you building?" required></textarea></div>
+        <button class="fbtn" type="submit">Open Email Draft →</button>
+      </form>
+    </div>
+  </div>
+</section>
+</main>
 
-    <script>
-        /* ── LOADER ── */
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                document.getElementById('loader').classList.add('hidden');
-            }, 900);
-        });
+<!-- FOOTER -->
+<footer>
+  <span class="ftr-copy">© 2026 Veyantra. Built with clarity and purpose.</span>
+  <div class="ftr-links">
+    <a href="#about" class="ftr-lnk">About</a>
+    <a href="#projects" class="ftr-lnk">Projects</a>
+    <a href="#services" class="ftr-lnk">Services</a>
+    <a href="#pricing" class="ftr-lnk">Pricing</a>
+    <a href="#contact" class="ftr-lnk">Contact</a>
+    <a href="privacy.html" class="ftr-lnk">Privacy</a>
+    <a href="terms.html" class="ftr-lnk">Terms</a>
+    <a href="cookies.html" class="ftr-lnk">Cookies</a>
+  </div>
+</footer>
 
-        /* ── COUNTDOWN ── */
-        // Target: May 14, 2026 7:15 AM IST (UTC+5:30 → UTC: May 14 01:45 UTC)
-        const target = new Date('2026-05-20T02:30:00Z');
+<script>
+/* LOADER */
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const loader = document.getElementById('loader');
+    if (loader) loader.classList.add('hidden');
+  }, 900);
+});
 
-        function pad(n) { return String(n).padStart(2, '0'); }
+/* NAV SCROLL */
+const nb = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  if (nb) nb.classList.toggle('scrolled', window.scrollY > 48);
+}, { passive: true });
 
-        function tick(id, val) {
-            const el = document.getElementById(id);
-            const next = pad(val);
-            if (el.textContent !== next) {
-                el.classList.remove('tick');
-                void el.offsetWidth; // reflow
-                el.classList.add('tick');
-                el.textContent = next;
-            }
-        }
+/* CURSOR GLOW */
+const cursorGlow = document.getElementById('cursor-glow');
+let glowX = window.innerWidth / 2;
+let glowY = window.innerHeight / 2;
+let glowRaf = 0;
 
-        function updateCountdown() {
-            const now = new Date();
-            const diff = target - now;
+function syncGlow() {
+  if (!cursorGlow) return;
+  cursorGlow.style.transform = `translate(${glowX}px, ${glowY}px) translate(-50%, -50%)`;
+  glowRaf = 0;
+}
 
-            if (diff <= 0) {
-                ['cd-days', 'cd-hours', 'cd-mins', 'cd-secs'].forEach(id => {
-                    document.getElementById(id).textContent = '00';
-                });
-                // Redirect to veyantra.html when timer ends
-                window.location.href = 'veyantra.html';
-                return;
-            }
+window.addEventListener('pointermove', (event) => {
+  if (!cursorGlow) return;
+  cursorGlow.classList.add('active');
+  glowX = event.clientX;
+  glowY = event.clientY;
+  if (!glowRaf) glowRaf = requestAnimationFrame(syncGlow);
+}, { passive: true });
 
-            const days = Math.floor(diff / 86400000);
-            const hours = Math.floor((diff % 86400000) / 3600000);
-            const mins = Math.floor((diff % 3600000) / 60000);
-            const secs = Math.floor((diff % 60000) / 1000);
+window.addEventListener('pointerleave', () => {
+  if (cursorGlow) cursorGlow.classList.remove('active');
+});
 
-            tick('cd-days', days);
-            tick('cd-hours', hours);
-            tick('cd-mins', mins);
-            tick('cd-secs', secs);
-        }
+/* CONTACT FORM FALLBACK */
+const contactForm = document.getElementById('contact-form');
+if (contactForm) {
+  contactForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const name = document.getElementById('client-name')?.value.trim() || '';
+    const email = document.getElementById('client-email')?.value.trim() || '';
+    const project = document.getElementById('project-type')?.value.trim() || '';
+    const vision = document.getElementById('project-vision')?.value.trim() || '';
+    const subject = encodeURIComponent('New Veyantra inquiry');
+    const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nProject Type: ${project}\n\nProject Details:\n${vision}`);
+    window.location.href = `mailto:contact.yogendrameena@gmail.com?subject=${subject}&body=${body}`;
+  });
+}
 
-        updateCountdown();
-        setInterval(updateCountdown, 1000);
+/* REVEAL */
+const rvls = document.querySelectorAll('.reveal');
+if ('IntersectionObserver' in window) {
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
+  rvls.forEach((el) => revealObserver.observe(el));
+} else {
+  rvls.forEach((el) => el.classList.add('visible'));
+}
 
-        /* ── EMAIL NOTIFY ── */
-        function handleNotify() {
-            const input = document.getElementById('email-input');
-            const success = document.getElementById('notify-success');
-            const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+/* DOT GRID */
+(function () {
+  const c = document.getElementById('grid-canvas');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  let W;
+  let H;
+  let resizeTimer = 0;
 
-            if (!emailRe.test(input.value)) {
-                input.style.borderColor = 'rgba(248,113,113,0.4)';
-                setTimeout(() => { input.style.borderColor = ''; }, 1500);
-                return;
-            }
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    const gap = 36;
+    const r = 1;
+    ctx.fillStyle = 'rgba(200,210,230,0.18)';
+    for (let x = gap / 2; x < W; x += gap) {
+      for (let y = gap / 2; y < H; y += gap) {
+        const dx = x - W / 2;
+        const dy = y - H * 0.38;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const maxD = Math.sqrt((W / 2) ** 2 + (H / 2) ** 2);
+        const alpha = Math.max(0, 0.22 - (dist / maxD) * 0.22);
+        ctx.globalAlpha = alpha;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
 
-            input.style.display = 'none';
-            document.querySelector('.notify-btn').style.display = 'none';
-            success.style.display = 'inline';
-        }
+  function resize() {
+    W = c.width = window.innerWidth;
+    H = c.height = window.innerHeight;
+    draw();
+  }
 
-        /* ── DOT GRID ── */
-        (function initGrid() {
-            const canvas = document.getElementById('grid-canvas');
-            const ctx = canvas.getContext('2d');
-            let W, H;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(resize, 150);
+  }, { passive: true });
 
-            function resize() {
-                W = canvas.width = window.innerWidth;
-                H = canvas.height = window.innerHeight;
-                draw();
-            }
+  resize();
+})();
 
-            function draw() {
-                ctx.clearRect(0, 0, W, H);
-                const gap = 36;
-                const r = 1;
-                ctx.fillStyle = 'rgba(200, 210, 230, 0.18)';
+/* PARTICLES */
+(function () {
+  const c = document.getElementById('particles-canvas');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  let W;
+  let H;
+  const ps = [];
+  const N = 20;
 
-                for (let x = gap / 2; x < W; x += gap) {
-                    for (let y = gap / 2; y < H; y += gap) {
-                        // Distance from center for fade
-                        const dx = x - W / 2;
-                        const dy = y - H * 0.38;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-                        const maxD = Math.sqrt((W / 2) ** 2 + (H / 2) ** 2);
-                        const alpha = Math.max(0, 0.22 - (dist / maxD) * 0.22);
+  class P {
+    constructor() {
+      this.reset(true);
+    }
 
-                        ctx.globalAlpha = alpha;
-                        ctx.beginPath();
-                        ctx.arc(x, y, r, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-                }
-                ctx.globalAlpha = 1;
-            }
+    reset(r) {
+      this.x = Math.random() * (W || window.innerWidth);
+      this.y = r ? Math.random() * (H || window.innerHeight) : (H || window.innerHeight) + 10;
+      this.r = Math.random() * 1.2 + 0.3;
+      this.vy = -(Math.random() * 0.2 + 0.05);
+      this.vx = (Math.random() - 0.5) * 0.1;
+      this.alpha = Math.random() * 0.35 + 0.05;
+      this.life = 0;
+      this.maxLife = Math.random() * 300 + 200;
+    }
 
-            window.addEventListener('resize', resize);
-            resize();
-        })();
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      this.life++;
+      if (this.y < -10 || this.life > this.maxLife) this.reset(false);
+    }
 
-        /* ── FLOATING PARTICLES ── */
-        (function initParticles() {
-            const canvas = document.getElementById('particles-canvas');
-            const ctx = canvas.getContext('2d');
-            let W, H;
-            const particles = [];
-            const COUNT = 28;
+    draw() {
+      const fade = this.life < 60 ? this.life / 60 : this.life > this.maxLife - 60 ? (this.maxLife - this.life) / 60 : 1;
+      ctx.globalAlpha = this.alpha * fade;
+      ctx.fillStyle = '#c8d5e8';
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
 
-            class Particle {
-                constructor() { this.reset(true); }
-                reset(rand) {
-                    this.x = Math.random() * (W || window.innerWidth);
-                    this.y = rand ? Math.random() * (H || window.innerHeight) : (H || window.innerHeight) + 10;
-                    this.r = Math.random() * 1.2 + 0.3;
-                    this.vy = -(Math.random() * 0.25 + 0.05);
-                    this.vx = (Math.random() - 0.5) * 0.1;
-                    this.alpha = Math.random() * 0.35 + 0.05;
-                    this.life = 0;
-                    this.maxLife = Math.random() * 300 + 200;
-                }
-                update() {
-                    this.x += this.vx;
-                    this.y += this.vy;
-                    this.life++;
-                    if (this.y < -10 || this.life > this.maxLife) this.reset(false);
-                }
-                draw() {
-                    const fade = this.life < 60 ? this.life / 60 : this.life > this.maxLife - 60 ? (this.maxLife - this.life) / 60 : 1;
-                    ctx.globalAlpha = this.alpha * fade;
-                    ctx.fillStyle = '#c8d5e8';
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            }
+  function resize() {
+    W = c.width = window.innerWidth;
+    H = c.height = window.innerHeight;
+  }
 
-            function resize() {
-                W = canvas.width = window.innerWidth;
-                H = canvas.height = window.innerHeight;
-            }
+  function loop() {
+    ctx.clearRect(0, 0, W, H);
+    ps.forEach((particle) => {
+      particle.update();
+      particle.draw();
+    });
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(loop);
+  }
 
-            function init() {
-                for (let i = 0; i < COUNT; i++) particles.push(new Particle());
-            }
-
-            function loop() {
-                ctx.clearRect(0, 0, W, H);
-                particles.forEach(p => { p.update(); p.draw(); });
-                ctx.globalAlpha = 1;
-                requestAnimationFrame(loop);
-            }
-
-            window.addEventListener('resize', resize);
-            resize();
-            init();
-            loop();
-        })();
-    </script>
+  window.addEventListener('resize', resize, { passive: true });
+  resize();
+  for (let i = 0; i < N; i++) ps.push(new P());
+  loop();
+})();
+</script>
 </body>
-
 </html>
